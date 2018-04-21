@@ -11,6 +11,7 @@ public class Player : MonoBehaviour {
     private ParticleSystem _particleSystem;
 
     private Transform _feet;
+    private Transform _hands;
     private Force _force1, _force2, _force3;
 
     private bool _chargingForce = false;
@@ -23,6 +24,8 @@ public class Player : MonoBehaviour {
         _particleSystem = GetComponent<ParticleSystem>();
 
         _feet = transform.Find("Feet");
+        _hands = transform.Find("Hands");
+        _hands.gameObject.SetActive(false);
 
         _force1 = transform.Find("Force1").GetComponent<Force>();
         _force2 = transform.Find("Force2").GetComponent<Force>();
@@ -39,6 +42,11 @@ public class Player : MonoBehaviour {
         force();
         move();
         rotate();
+    }
+
+    private void FixedUpdate()
+    {
+        
     }
 
     private void move()
@@ -153,7 +161,9 @@ public class Player : MonoBehaviour {
                 break;
         }
 
+        _hands.gameObject.SetActive(true);
         yield return force.Activate(0.2f);
+        _hands.gameObject.SetActive(false);
 
         _spriteRenderer.color = Color.white;
 

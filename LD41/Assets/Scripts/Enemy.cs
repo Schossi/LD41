@@ -19,7 +19,8 @@ public class Enemy : MonoBehaviour
     private Transform _bloodPivot;
     private ParticleSystem _bloodParticles;
 
-    private bool dead = false;
+    private bool _standing = true;
+    private bool _dead = false;
 
     void Awake()
     {
@@ -51,7 +52,7 @@ public class Enemy : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (dead)
+        if (_dead || _standing)
             return;
 
         move();
@@ -64,6 +65,14 @@ public class Enemy : MonoBehaviour
         //_rigidbody.MovePosition(_rigidbody.position + movement);
     }
 
+    public void StartMoving()
+    {
+        _standing = false;
+
+        if (_animator != null)
+            _animator.SetBool("move", true);
+    }
+
     public void Hit(int level, Transform origin)
     {
         if (level >= Level)
@@ -74,7 +83,7 @@ public class Enemy : MonoBehaviour
 
     private void die(Transform origin)
     {
-        dead = true;
+        _dead = true;
 
         Vector2 direction = (transform.position - origin.position).normalized;
 
