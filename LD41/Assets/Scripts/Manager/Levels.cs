@@ -25,21 +25,21 @@ namespace Assets.Scripts.Manager
         {
             get
             {
-                return new Level(1, 0.25f, GetLevel1Waves());
+                return new Level(1, 0.20f, GetLevel1Waves());
             }
         }
         public static Level Level2
         {
             get
             {
-                return new Level(2, 0.30f, GetLevel2Waves());
+                return new Level(2, 0.25f, GetLevel2Waves());
             }
         }
         public static Level Level3
         {
             get
             {
-                return new Level(3, 0.40f, GetLevel3Waves());
+                return new Level(3, 0.35f, GetLevel3Waves());
             }
         }
 

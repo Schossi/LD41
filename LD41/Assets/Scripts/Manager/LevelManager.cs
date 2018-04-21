@@ -92,7 +92,7 @@ public class LevelManager : MonoBehaviour {
 
     private IEnumerator spawnNextWave()
     {
-        yield return new WaitForSeconds(10f);
+        yield return new WaitForSeconds(12f);
         spawnWave();
     }
 }
