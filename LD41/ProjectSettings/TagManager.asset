@@ -3,7 +3,10 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Force
+  - Sphere
+  - Enemy
   layers:
   - Default
   - TransparentFX
@@ -13,18 +16,18 @@ TagManager:
   - UI
   - 
   - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Collision
+  - Bounds
+  - Player
+  - SphereL1
+  - SphereL2
+  - SphereL3
+  - EnemyL1
+  - EnemyL2
+  - EnemyL3
+  - EnemyTL1
+  - EnemyTL2
+  - EnemyTL3
   - 
   - 
   - 
@@ -40,4 +43,19 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Ground
+    uniqueID: 3203500805
+    locked: 0
+  - name: OnGround
+    uniqueID: 208126793
+    locked: 0
+  - name: Sphere
+    uniqueID: 170602153
+    locked: 0
+  - name: Characters
+    uniqueID: 4007331313
+    locked: 0
+  - name: Top
+    uniqueID: 747683041
     locked: 0
