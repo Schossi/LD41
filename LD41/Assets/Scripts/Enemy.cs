@@ -81,8 +81,18 @@ public class Enemy : MonoBehaviour
         }
     }
 
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.tag.StartsWith("Village"))
+        {
+            GameManager.Instance.LevelLost();
+        }
+    }
+
     private void die(Transform origin)
     {
+        LevelManager.Instance.EnemyDefeated();
+
         _dead = true;
 
         Vector2 direction = (transform.position - origin.position).normalized;

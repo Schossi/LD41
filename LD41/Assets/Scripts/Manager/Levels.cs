@@ -13,8 +13,12 @@ namespace Assets.Scripts.Manager
             {
                 case 1:
                     return Level.Level1;
+                case 2:
+                    return Level.Level2;
+                case 3:
+                    return Level.Level3;
                 default:
-                    return null;
+                    return Level.Level1;
             }
         }
     }

@@ -7,6 +7,11 @@ public class LevelManager : MonoBehaviour {
 
     public static LevelManager Instance;
 
+    public const float DelayStart = 2f;
+    public const float DelayBetween = 12f;
+
+    public int EnemyCount = 0;
+
     public Spawner Spawner;
 
     public List<Enemy> EnemiesL1;
@@ -34,7 +39,15 @@ public class LevelManager : MonoBehaviour {
         Level = Levels.GetLevel(level);
 
         Enemy.Speed = Level.EnemySpeed;
-        spawnWave();
+
+        StartCoroutine(spawnNextWave(DelayStart));
+    }
+
+    public void EnemyDefeated()
+    {
+        EnemyCount--;
+        if (Level.Waves.Count == 0 && EnemyCount <= 0)
+            GameManager.Instance.LevelFinished();
     }
 
     private void spawnWave()
@@ -50,7 +63,6 @@ public class LevelManager : MonoBehaviour {
             }
             else
             {
-                GameManager.Instance.LevelFinished();
                 return;
             }
         }
@@ -63,7 +75,7 @@ public class LevelManager : MonoBehaviour {
             spawnEntry(entry);
         }
 
-        StartCoroutine(spawnNextWave());
+        StartCoroutine(spawnNextWave(DelayBetween));
     }
     private void spawnEntry(WaveEntry entry)
     {
@@ -85,14 +97,16 @@ public class LevelManager : MonoBehaviour {
     }    
     private void spawn(Enemy enemy,int x,int y)
     {
+        EnemyCount++;
+
         Spawner spawner = Instantiate(Spawner, transform.parent);
         spawner.transform.position = new Vector2(-3 + x, 4 - y);
         spawner.EnemyTemplate = () => enemy;
     }
 
-    private IEnumerator spawnNextWave()
+    private IEnumerator spawnNextWave(float delay)
     {
-        yield return new WaitForSeconds(12f);
+        yield return new WaitForSeconds(delay);
         spawnWave();
     }
 }

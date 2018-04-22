@@ -7,6 +7,8 @@ TagManager:
   - Force
   - Sphere
   - Enemy
+  - Village
+  - Bounds
   layers:
   - Default
   - TransparentFX
@@ -28,8 +30,8 @@ TagManager:
   - EnemyTL1
   - EnemyTL2
   - EnemyTL3
-  - 
-  - 
+  - PlayerBounds
+  - Village
   - 
   - 
   - 

@@ -12,8 +12,8 @@ public class GameLoader : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-		
-	}
+        GameManager.Instance.StartScene();
+    }
 	
 	// Update is called once per frame
 	void Update () {

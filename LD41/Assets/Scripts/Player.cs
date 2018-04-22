@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Player : MonoBehaviour {
-    
+
+    public const float ReturnSphereDuration = 5f;
+
     public float Speed = 10;
-    
+
+    public Sphere Sphere;
+
     private Rigidbody2D _rigidbody;
     private SpriteRenderer _spriteRenderer;
-    private ParticleSystem _particleSystem;
+    private ParticleSystem _chargeForceParts, _returnSphereParts;
 
     private Transform _feet;
     private Transform _hands;
@@ -16,12 +20,35 @@ public class Player : MonoBehaviour {
 
     private bool _chargingForce = false;
     private bool _performingForce = false;
+    public bool PerformingForce
+    {
+        get
+        {
+            return _performingForce;
+        }
+    }
+
+    private bool _waitingForSphere = false;
+
+    private Force _currentForce = null;
+    public Force CurrentForce
+    {
+        get
+        {
+            return _currentForce;
+        }
+    }
+
+    private bool _usingController = false;
+    private Vector3 _previousMousePosition;
 
     void Awake()
     {
         _rigidbody = GetComponent<Rigidbody2D>();
         _spriteRenderer = GetComponent<SpriteRenderer>();
-        _particleSystem = GetComponent<ParticleSystem>();
+        
+        _chargeForceParts = transform.Find("ChargeForce").GetComponent<ParticleSystem>();
+        _returnSphereParts = transform.Find("ReturnSphere").GetComponent<ParticleSystem>();
 
         _feet = transform.Find("Feet");
         _hands = transform.Find("Hands");
@@ -34,7 +61,7 @@ public class Player : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-		
+        SphereLost();
 	}
 	
 	// Update is called once per frame
@@ -43,10 +70,11 @@ public class Player : MonoBehaviour {
         move();
         rotate();
     }
-
-    private void FixedUpdate()
+    
+    public void SphereLost()
     {
-        
+        _returnSphereParts.Play();
+        _waitingForSphere = true;
     }
 
     private void move()
@@ -83,20 +111,63 @@ public class Player : MonoBehaviour {
         }
         else
         {
-            Vector2 direction = Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position;
+            Vector2 direction;
+
+            float horizontal = Input.GetAxis("RHorizontal");
+            float vertical = Input.GetAxis("RVertical");
+            Vector2 controllerDirection = new Vector2(horizontal, -vertical);
+
+            if (controllerDirection.sqrMagnitude > 0.5)
+            {
+                direction = controllerDirection;
+
+                _usingController = true;
+                _previousMousePosition = Input.mousePosition;
+            }
+            else
+            {
+                if (_usingController)
+                {
+                    if (Vector3.Distance(_previousMousePosition, Input.mousePosition) < 10)
+                        return;
+                    _usingController = false;
+                }
+
+                direction = Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position;
+            }
 
             float angle = Mathf.Atan2(direction.x, direction.y);
 
-            _rigidbody.MoveRotation(-angle * Mathf.Rad2Deg);
+            transform.rotation = Quaternion.Euler(0f, 0f, -angle*Mathf.Rad2Deg);
+            //_rigidbody.MoveRotation(-angle * Mathf.Rad2Deg);
         }
     }
 
     private void force()
     {
-        if (Input.GetButtonDown("Fire1"))
+        if (_waitingForSphere)
         {
-            StartCoroutine(performForce());
+            if (!_returnSphereParts.isPlaying)
+            {
+                ParticleSystem.MainModule mm = _returnSphereParts.main;
+                mm.duration = ReturnSphereDuration;
+                _waitingForSphere = false;
+                createSphere();
+            }
         }
+        else
+        {
+            if (Input.GetButtonDown("Fire1"))
+            {
+                StartCoroutine(performForce());
+            }
+        }
+    }
+
+    private void createSphere()
+    {
+        Sphere sphere = Instantiate(Sphere, transform);
+        sphere.transform.localPosition = new Vector3(0f, 0.5f);
     }
 
     private IEnumerator performForce()
@@ -108,16 +179,19 @@ public class Player : MonoBehaviour {
 
         _spriteRenderer.color = _force1.SpriteRenderer.color;
 
-        ParticleSystem.MainModule particles = _particleSystem.main;
+        ParticleSystem.MainModule particles = _chargeForceParts.main;
 
         particles.startColor = _force1.SpriteRenderer.color;
         particles.startLifetime = new ParticleSystem.MinMaxCurve(0.25f);
         particles.startSpeed = new ParticleSystem.MinMaxCurve(1f);
 
-        _particleSystem.Play();
+        _chargeForceParts.Play();
 
         while (Input.GetButton("Fire1"))
         {
+            if (_waitingForSphere)
+                break;
+
             duration += Time.deltaTime;
 
             if (forceLevel==1 && duration > 0.5f)
@@ -143,32 +217,38 @@ public class Player : MonoBehaviour {
             yield return null;
         }
 
-        _particleSystem.Stop();
+        _chargeForceParts.Stop();
         _chargingForce = false;
+
+        if (_waitingForSphere)
+        {
+            _spriteRenderer.color = Color.white;
+            yield break;
+        }
+
         _performingForce = true;
 
-        Force force = null;
         switch (forceLevel)
         {
             case 1:
-                force = _force1;
+                _currentForce = _force1;
                 break;
             case 2:
-                force = _force2;
+                _currentForce = _force2;
                 break;
             case 3:
-                force = _force3;
+                _currentForce = _force3;
                 break;
         }
 
         _hands.gameObject.SetActive(true);
-        yield return force.Activate(0.2f);
+        yield return _currentForce.Activate(0.2f);
         _hands.gameObject.SetActive(false);
 
         _spriteRenderer.color = Color.white;
 
+        _currentForce = null;
         _performingForce = false;
 
     }
-
 }
