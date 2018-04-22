@@ -9,6 +9,7 @@ TagManager:
   - Enemy
   - Village
   - Bounds
+  - Boss
   layers:
   - Default
   - TransparentFX

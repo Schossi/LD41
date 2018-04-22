@@ -16,6 +16,8 @@ public class Sphere : MonoBehaviour {
 
     private bool _fired = false;
     
+    private AudioSource[] _audioSources;
+
     void Awake()
     {
         _sprite = transform.Find("Sprite");
@@ -25,6 +27,8 @@ public class Sphere : MonoBehaviour {
         _particleSystem = GetComponent<ParticleSystem>();
 
         _player = GetComponentInParent<Player>();
+
+        _audioSources = GetComponents<AudioSource>();
     }
 
     // Use this for initialization
@@ -61,8 +65,13 @@ public class Sphere : MonoBehaviour {
         {
             hitEnemy(collision.collider.GetComponentInParent<Enemy>());
         }
+        if (collision.collider.CompareTag("Boss"))
+        {
+            hitBoss(collision.collider.GetComponentInParent<Boss>());
+        }
         else if (collision.collider.CompareTag("Bounds"))
         {
+            playSound(0);
             if (_forceLevel > 1)
                 ApplyForce(_forceLevel - 1, _rigidbody2D.velocity.normalized);
         }
@@ -98,7 +107,23 @@ public class Sphere : MonoBehaviour {
 
     private void hitEnemy(Enemy enemy)
     {
-        enemy.Hit(_forceLevel, transform);
+        if (enemy.Hit(_forceLevel, transform))
+            playSound(1);
+        else
+            playSound(0);
+    }
+
+    private void hitBoss(Boss boss)
+    {
+        if (_forceLevel == 3)
+        {
+            boss.Hit();
+            playSound(1);
+        }
+        else
+        {
+            playSound(0);
+        }
     }
 
     private void lost()
@@ -110,5 +135,11 @@ public class Sphere : MonoBehaviour {
     {
         yield return new WaitForSeconds(seconds);
         Destroy(gameObject);
+    }
+    
+    private void playSound(int index)
+    {
+        if (GameManager.Instance.SoundEnabled)
+            _audioSources[index].Play();
     }
 }

@@ -19,6 +19,8 @@ public class Player : MonoBehaviour {
     private Transform _hands;
     private Force _force1, _force2, _force3;
 
+    private AudioSource[] _audioSources; 
+
     private bool _chargingForce = false;
     private bool _performingForce = false;
     public bool PerformingForce
@@ -58,6 +60,8 @@ public class Player : MonoBehaviour {
         _force1 = transform.Find("Force1").GetComponent<Force>();
         _force2 = transform.Find("Force2").GetComponent<Force>();
         _force3 = transform.Find("Force3").GetComponent<Force>();
+
+        _audioSources = GetComponents<AudioSource>();
     }
 
     // Use this for initialization
@@ -205,6 +209,7 @@ public class Player : MonoBehaviour {
         particles.startSpeed = new ParticleSystem.MinMaxCurve(1f);
 
         _chargeForceParts.Play();
+        playSound(0);
 
         while (Input.GetButton("Fire1"))
         {
@@ -221,6 +226,8 @@ public class Player : MonoBehaviour {
                 particles.startColor = _force2.SpriteRenderer.color;
                 particles.startLifetime = new ParticleSystem.MinMaxCurve(0.35f);
                 particles.startSpeed = new ParticleSystem.MinMaxCurve(1.5f);
+
+                playSound(1);
             }
 
             if (forceLevel==2 && duration > 1f)
@@ -231,6 +238,8 @@ public class Player : MonoBehaviour {
                 particles.startColor = _force3.SpriteRenderer.color;
                 particles.startLifetime = new ParticleSystem.MinMaxCurve(0.45f);
                 particles.startSpeed = new ParticleSystem.MinMaxCurve(2f);
+
+                playSound(2);
             }
 
             yield return null;
@@ -260,6 +269,7 @@ public class Player : MonoBehaviour {
                 break;
         }
 
+        playSound(3);
         _hands.gameObject.SetActive(true);
         yield return _currentForce.Activate(0.2f);
         _hands.gameObject.SetActive(false);
@@ -269,5 +279,11 @@ public class Player : MonoBehaviour {
         _currentForce = null;
         _performingForce = false;
 
+    }
+
+    private void playSound(int index)
+    {
+        if (GameManager.Instance.SoundEnabled)
+            _audioSources[index].Play();
     }
 }

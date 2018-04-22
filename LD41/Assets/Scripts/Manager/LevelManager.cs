@@ -20,6 +20,9 @@ public class LevelManager : MonoBehaviour {
 
     public Level Level { get; private set; }
 
+    private bool _waitingToSpawn = false;
+    private bool _spawnImmediately = false;
+
     void Awake()
     {
         Instance = this;
@@ -46,15 +49,22 @@ public class LevelManager : MonoBehaviour {
     public void EnemyDefeated()
     {
         EnemyCount--;
-        if (Level.Waves.Count == 0 && EnemyCount <= 0)
-            GameManager.Instance.LevelFinished();
+
+        if (EnemyCount <= 0)
+        {
+            if (Level.Waves.Count == 0)
+                GameManager.Instance.LevelFinished();
+            else if (_waitingToSpawn)
+                _spawnImmediately = true;
+
+        }
     }
 
     private void spawnWave()
     {
         if (Level.Waves.Count == 0)
         {
-            if (Level.Number == 3)
+            if (Level.Number == 3 && EnemyCount > 0)
             {
                 Level.Waves.Add(new Wave(
 "X11X11X" +
@@ -106,7 +116,17 @@ public class LevelManager : MonoBehaviour {
 
     private IEnumerator spawnNextWave(float delay)
     {
-        yield return new WaitForSeconds(delay);
+        _waitingToSpawn = true;
+
+        float passed = 0f;
+        while (passed < delay && !_spawnImmediately)
+        {
+            passed += Time.deltaTime;
+            yield return null;
+        }
+
+        _waitingToSpawn = false;
+        _spawnImmediately = false;
         spawnWave();
     }
 }

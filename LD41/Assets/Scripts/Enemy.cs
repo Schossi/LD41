@@ -18,7 +18,7 @@ public class Enemy : MonoBehaviour
 
     private Transform _bloodPivot;
     private ParticleSystem _bloodParticles;
-
+    
     private bool _standing = true;
     private bool _dead = false;
 
@@ -73,12 +73,13 @@ public class Enemy : MonoBehaviour
             _animator.SetBool("move", true);
     }
 
-    public void Hit(int level, Transform origin)
+    public bool Hit(int level, Transform origin)
     {
-        if (level >= Level)
-        {
-            die(origin);
-        }
+        if (level < Level)
+            return false;
+
+        die(origin);
+        return true;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -119,5 +120,5 @@ public class Enemy : MonoBehaviour
         }
 
         Destroy(gameObject);
-    }
+    }    
 }

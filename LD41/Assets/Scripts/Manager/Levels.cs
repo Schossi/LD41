@@ -97,8 +97,8 @@ namespace Assets.Scripts.Manager
             ));
 
             waves.Add(new Wave(
-"X2X2X2X" +
-"XX2X2XX"
+"X2X1X2X" +
+"X21X12X"
             ));
 
             waves.Add(new Wave(
@@ -171,13 +171,13 @@ namespace Assets.Scripts.Manager
             ));
 
             waves.Add(new Wave(
-"X11111X" +
+"X11X11X" +
 "XX222XX"
             ));
 
             waves.Add(new Wave(
-"X12221X" +
-"X33X33X"
+"X12X21X" +
+"X33133X"
             ));
 
             waves.Add(new Wave(
@@ -186,12 +186,12 @@ namespace Assets.Scripts.Manager
             ));
 
             waves.Add(new Wave(
-"1111111" +
+"111X111" +
 "3X222X3"
             ));
 
             waves.Add(new Wave(
-"2222222" +
+"222X222" +
 "1111111"
             ));
 
