@@ -6,7 +6,8 @@ public class Player : MonoBehaviour {
 
     public const float ReturnSphereDuration = 5f;
 
-    public float Speed = 10;
+    public const float DefaultSpeed = 8f;
+    public const float SwiftSpeed = 12f;
 
     public Sphere Sphere;
 
@@ -62,10 +63,20 @@ public class Player : MonoBehaviour {
     // Use this for initialization
     void Start () {
         SphereLost();
+
+        if (GameManager.Instance.WidthEnabled)
+        {
+            _force1.transform.localScale = new Vector3(_force1.transform.localScale.x * 1.5f, _force1.transform.localScale.y, _force1.transform.localScale.z);
+            _force2.transform.localScale = new Vector3(_force2.transform.localScale.x * 1.5f, _force2.transform.localScale.y, _force2.transform.localScale.z);
+            _force3.transform.localScale = new Vector3(_force3.transform.localScale.x * 1.5f, _force3.transform.localScale.y, _force3.transform.localScale.z);
+        }
 	}
 	
 	// Update is called once per frame
 	void Update () {
+        if (GameManager.Instance.Paused)
+            return;
+
         force();
         move();
         rotate();
@@ -76,10 +87,18 @@ public class Player : MonoBehaviour {
         _returnSphereParts.Play();
         _waitingForSphere = true;
     }
+    
+    private float getSpeed()
+    {
+        if (GameManager.Instance.SwiftEnabled)
+            return SwiftSpeed;
+        else
+            return DefaultSpeed;
+    }
 
     private void move()
     {
-        if (_chargingForce || _performingForce)
+        if ((_chargingForce && !GameManager.Instance.ChargeEnabled) || _performingForce)
         {
             _feet.localPosition = Vector2.zero;
         }
@@ -98,7 +117,7 @@ public class Player : MonoBehaviour {
 
             direction = direction.normalized * Mathf.Min(direction.magnitude, 1.0f);
 
-            _rigidbody.MovePosition(_rigidbody.position + direction * Speed * Time.deltaTime);
+            _rigidbody.MovePosition(_rigidbody.position + direction * getSpeed() * Time.deltaTime);
 
             _feet.localPosition = transform.worldToLocalMatrix.MultiplyVector(-direction) * 0.2f;
         }

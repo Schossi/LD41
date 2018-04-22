@@ -10,14 +10,18 @@ public class Sphere : MonoBehaviour {
     private SpriteRenderer _spriteRenderer;
     private ParticleSystem _particleSystem;
 
+    private Transform _sprite;
+
     private int _forceLevel = 0;
 
     private bool _fired = false;
     
     void Awake()
     {
+        _sprite = transform.Find("Sprite");
+
         _rigidbody2D = GetComponent<Rigidbody2D>();
-        _spriteRenderer = GetComponent<SpriteRenderer>();
+        _spriteRenderer = _sprite.GetComponent<SpriteRenderer>();
         _particleSystem = GetComponent<ParticleSystem>();
 
         _player = GetComponentInParent<Player>();
@@ -30,7 +34,7 @@ public class Sphere : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        transform.Rotate(Vector3.forward, (50f + _forceLevel * 150f) * Time.deltaTime);
+        _sprite.Rotate(Vector3.forward, (50f + _forceLevel * 150f) * Time.deltaTime);
 
         if (!_fired && _player != null && _player.CurrentForce != null)
             applyForce(_player.CurrentForce);
@@ -60,36 +64,36 @@ public class Sphere : MonoBehaviour {
         else if (collision.collider.CompareTag("Bounds"))
         {
             if (_forceLevel > 1)
-                setForceLevel(_forceLevel - 1);
+                ApplyForce(_forceLevel - 1, _rigidbody2D.velocity.normalized);
         }
     }
 
     private void applyForce(Force force)
+    {
+        ApplyForce(force.Level, force.transform.up);
+    }
+
+    public void ApplyForce(int level,Vector3 direction)
     {
         if (!_fired)
         {
             _fired = true;
             _rigidbody2D.bodyType = RigidbodyType2D.Dynamic;
             transform.SetParent(null);
+            transform.localRotation = Quaternion.identity;
             _particleSystem.Play();
         }
 
-        setForceLevel(force.Level);
-
-        _rigidbody2D.velocity = force.transform.up * force.Power;
-    }
-
-    private void setForceLevel(int level)
-    {
         _forceLevel = level;
 
         gameObject.layer = LayerMask.NameToLayer("SphereL" + _forceLevel.ToString());
 
-        _spriteRenderer.color = Force.GetForceColor(_forceLevel);
+        _spriteRenderer.color = global::Force.GetForceColor(_forceLevel);
 
         ParticleSystem.MainModule particles = _particleSystem.main;
         particles.startColor = _spriteRenderer.color;
 
+        _rigidbody2D.velocity = direction * global::Force.GetForcePower(_forceLevel);
     }
 
     private void hitEnemy(Enemy enemy)

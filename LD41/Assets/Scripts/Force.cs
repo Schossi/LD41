@@ -10,12 +10,19 @@ public class Force : MonoBehaviour {
     public static Color Force3Color;
 
     public int Level;
-    public float Power;
     
     public SpriteRenderer SpriteRenderer { get; private set; }
 
     public static Color GetForceColor(int level)
     {
+        if (!_forceColorsSet)
+        {
+            _forceColorsSet = true;
+            ColorUtility.TryParseHtmlString("#33A5FF", out Force1Color);
+            ColorUtility.TryParseHtmlString("#3259E2", out Force2Color);
+            ColorUtility.TryParseHtmlString("#28237B", out Force3Color);
+        }
+
         switch (level)
         {
             case 1:
@@ -28,17 +35,23 @@ public class Force : MonoBehaviour {
                 return Force1Color;
         }
     }
+    public static float GetForcePower(int level)
+    {
+        switch (level)
+        {
+            case 1:
+                return 5;
+            case 2:
+                return 7;
+            case 3:
+                return 10;
+            default:
+                return 5;
+        }
+    }
 
     void Awake()
     {
-        if (!_forceColorsSet)
-        {
-            _forceColorsSet = true;
-            ColorUtility.TryParseHtmlString("#33A5FF", out Force1Color);
-            ColorUtility.TryParseHtmlString("#3259E2", out Force2Color);
-            ColorUtility.TryParseHtmlString("#28237B", out Force3Color);
-        }
-
         SpriteRenderer = GetComponent<SpriteRenderer>();            
     }
 

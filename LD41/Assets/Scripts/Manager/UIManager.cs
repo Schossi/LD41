@@ -24,8 +24,8 @@ public class UIManager : MonoBehaviour {
 
     public void SetProgress(int progress)
     {
-        transform.Find("ButtonLevel2").GetComponent<Button>().interactable = progress > 0;
-        transform.Find("ButtonLevel3").GetComponent<Button>().interactable = progress > 1;
+        transform.Find("LevelButtons").Find("ButtonLevel2").GetComponent<Button>().interactable = progress > 0;
+        transform.Find("LevelButtons").Find("ButtonLevel3").GetComponent<Button>().interactable = progress > 1;
 
         transform.Find("ImageWon").gameObject.SetActive(progress > 2);
     }

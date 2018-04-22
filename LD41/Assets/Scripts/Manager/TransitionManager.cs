@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class TransitionManager : MonoBehaviour {
 
-    public const float TransitionDuration = 1f;
+    public const float TransitionDuration = 1.5f;
 
     public static TransitionManager Instance;
 
